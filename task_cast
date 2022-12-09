@@ -63,26 +63,28 @@ SYSCALL_DEFINE5(task_cast,
 #include <errno.h>
 
 #define __NR_task_cast 550
-#define TASK_PID 1692
 
 struct data{
     unsigned int uid;
     int files_size;
 };
 
-long identity_syscall(struct data* addr, char* com_path, unsigned long* inodes, char* remote_path)
+long identity_syscall(int pid, struct data* addr, char* com_path, unsigned long* inodes, char* remote_path)
 {
-    return syscall(__NR_task_cast, TASK_PID, addr, com_path, inodes, remote_path);
+    return syscall(__NR_task_cast, pid, addr, com_path, inodes, remote_path);
 }
 
 int main(int argc, char *argv[])
 {
+    char *a = argv[1];
+    int pid = atoi(a);
+
     long activity;
-    struct data* addr = malloc(sizeof(struct data));
-    char* com_path = malloc(sizeof(char)*100);
-    unsigned long* inodes = malloc(sizeof(unsigned long)*30);
-    char* remote_path = malloc(sizeof(char)*100*30);
-    activity = identity_syscall(addr, com_path, inodes, remote_path);
+    struct data* addr = (struct data*)malloc(sizeof(struct data));
+    char* com_path = (char*)malloc(sizeof(char)*100);
+    unsigned long* inodes = (unsigned long*)malloc(sizeof(unsigned long)*30);
+    char* remote_path = (char*)malloc(sizeof(char)*100*30);
+    activity = identity_syscall(pid, addr, com_path, inodes, remote_path);
 
     if(activity < 0)
     {
@@ -103,6 +105,11 @@ int main(int argc, char *argv[])
             printf("Open file with fd inode: %lu path: %s \n", inodes[i], &remote_path[100*i]);
         }
     }
+
+    free(addr);
+    free(com_path);
+    free(inodes);
+    free(remote_path);
 
 
     return 0;

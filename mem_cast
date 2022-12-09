@@ -54,8 +54,12 @@ int main(int argc, char *argv[])
 {
     long activity;
     int data_size = 0;
-    struct data* dataa = malloc(sizeof(struct data)*30);
+    struct data* dataa = (struct data*)malloc(sizeof(struct data)*30);
     activity = identity_syscall(&data_size, dataa);
+
+    if(activity > 0){
+        return 1;
+    }
 
     for (int i = 0; i < data_size; ++i)
     {
@@ -63,6 +67,8 @@ int main(int argc, char *argv[])
         printf("size %llu \n", dataa[i].size);
         printf("flags %llu \n", dataa[i].flags);
     }
+
+    free(dataa);
 
     return 0;
 }
